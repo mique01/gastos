@@ -1,13 +1,13 @@
 // Configuración de Firebase (reemplaza con tu propia configuración)
 const firebaseConfig = {
-  apiKey: "AIzaSyAQxA-ZU7fcWehR91boKzSkX32qGLIBqW4",
-  authDomain: "control-gastos-54f2a.firebaseapp.com",
-  projectId: "control-gastos-54f2a",
-  storageBucket: "control-gastos-54f2a.firebasestorage.app",
-  messagingSenderId: "936076380258",
-  appId: "1:936076380258:web:c4bb45c9a866745754293b",
-  measurementId: "G-RRN68VR5ZV"
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_AUTH_DOMAIN",
+    projectId: "TU_PROJECT_ID",
+    storageBucket: "TU_STORAGE_BUCKET",
+    messagingSenderId: "TU_MESSAGING_SENDER_ID",
+    appId: "TU_APP_ID"
 };
+
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -34,9 +34,14 @@ const people = document.getElementById('people');
 const expenseList = document.getElementById('expenseList');
 const timeFilter = document.getElementById('timeFilter');
 const stats = document.getElementById('stats');
+const exportCsv = document.getElementById('exportCsv');
+const categoryChart = document.getElementById('categoryChart').getContext('2d');
+const peopleChart = document.getElementById('peopleChart').getContext('2d');
+const methodChart = document.getElementById('methodChart').getContext('2d');
 
-// Estado del usuario
+// Estado del usuario y gráficos
 let userId = null;
+let categoryChartInstance, peopleChartInstance, methodChartInstance;
 
 // Autenticación
 googleLogin.addEventListener('click', () => {
@@ -136,7 +141,7 @@ function loadExpenses() {
         });
 }
 
-// Estadísticas
+// Estadísticas y Gráficos
 timeFilter.addEventListener('change', (e) => loadStats(e.target.value));
 
 function loadStats(period) {
@@ -148,27 +153,75 @@ function loadStats(period) {
 
     db.collection('users').doc(userId).collection('expenses')
         .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(start))
-        .get().then(snapshot => {
-            const totals = { total: 0, byCategory: {}, byMethod: {} };
+        .get().then(async snapshot => {
+            const totals = { total: 0, byCategory: {}, byMethod: {}, byPeople: {} };
             snapshot.forEach(doc => {
                 const data = doc.data();
                 totals.total += data.amount;
                 totals.byCategory[data.category] = (totals.byCategory[data.category] || 0) + data.amount;
                 totals.byMethod[data.paymentMethod] = (totals.byMethod[data.paymentMethod] || 0) + data.amount;
+                data.people.forEach(person => {
+                    totals.byPeople[person] = (totals.byPeople[person] || 0) + (data.amount / data.people.length);
+                });
             });
 
+            // Actualizar texto de estadísticas
             stats.innerHTML = `
                 <div class="p-4 bg-blue-100 rounded">
                     <h3 class="font-semibold">Total: $${totals.total.toFixed(2)}</h3>
                 </div>
-                <div class="p-4 bg-green-100 rounded">
-                    <h3 class="font-semibold">Por Categoría:</h3>
-                    ${Object.entries(totals.byCategory).map(([cat, amt]) => `<p>${cat}: $${amt.toFixed(2)}</p>`).join('')}
-                </div>
-                <div class="p-4 bg-yellow-100 rounded">
-                    <h3 class="font-semibold">Por Método:</h3>
-                    ${Object.entries(totals.byMethod).map(([method, amt]) => `<p>${method}: $${amt.toFixed(2)}</p>`).join('')}
-                </div>
             `;
+
+            // Actualizar gráficos
+            updateChart(categoryChartInstance, categoryChart, 'Por Categoría', totals.byCategory);
+            updateChart(peopleChartInstance, peopleChart, 'Por Persona', totals.byPeople);
+            updateChart(methodChartInstance, methodChart, 'Por Método', totals.byMethod);
         });
 }
+
+function updateChart(instance, ctx, label, data) {
+    if (instance) instance.destroy();
+    instance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data),
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: label }
+            }
+        }
+    });
+    if (ctx === categoryChart) categoryChartInstance = instance;
+    else if (ctx === peopleChart) peopleChartInstance = instance;
+    else methodChartInstance = instance;
+}
+
+// Exportar a CSV
+exportCsv.addEventListener('click', () => {
+    db.collection('users').doc(userId).collection('expenses')
+        .orderBy('timestamp', 'desc').get()
+        .then(snapshot => {
+            const csvRows = ['Monto,Categoría,Método de Pago,Personas,Fecha'];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const date = data.timestamp.toDate().toISOString();
+                const people = data.people.join(';');
+                csvRows.push(`${data.amount},${data.category},${data.paymentMethod},${people},${date}`);
+            });
+            const csvContent = 'data:text/csv;charset=utf-8,' + csvRows.join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'gastos.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+});
