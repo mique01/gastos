@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Gastos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div id="auth" class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h1 class="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h1>
+            <button id="googleLogin" class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 mb-2">Iniciar con Google</button>
+            <input id="email" type="email" placeholder="Email" class="w-full p-2 mb-2 border rounded">
+            <input id="password" type="password" placeholder="Contraseña" class="w-full p-2 mb-2 border rounded">
+            <button id="emailLogin" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Iniciar con Email</button>
+            <button id="register" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 mt-2">Registrarse</button>
+        </div>
+    </div>
+
+    <div id="app" class="hidden p-4">
+        <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+            <h1 class="text-3xl font-bold mb-4">Control de Gastos</h1>
+            <button id="logout" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 mb-4">Cerrar Sesión</button>
+
+            <!-- Formulario de Gastos -->
+            <div class="mb-6">
+                <input id="amount" type="number" placeholder="Monto" class="p-2 border rounded w-full mb-2">
+                <select id="category" class="p-2 border rounded w-full mb-2">
+                    <option value="">Seleccionar Categoría</option>
+                </select>
+                <input id="newCategory" placeholder="Nueva Categoría" class="p-2 border rounded w-full mb-2">
+                <select id="paymentMethod" class="p-2 border rounded w-full mb-2">
+                    <option value="">Método de Pago</option>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
+                <div class="mb-2">
+                    <label>¿Vives solo?</label>
+                    <input type="radio" name="livesAlone" value="yes" id="livesYes" class="ml-2">
+                    <label for="livesYes">Sí</label>
+                    <input type="radio" name="livesAlone" value="no" id="livesNo" class="ml-2">
+                    <label for="livesNo">No</label>
+                </div>
+                <div id="peopleSection" class="hidden">
+                    <input id="people" placeholder="Personas (separadas por coma)" class="p-2 border rounded w-full mb-2">
+                </div>
+                <button id="addExpense" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Agregar Gasto</button>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-2">Estadísticas</h2>
+                <select id="timeFilter" class="p-2 border rounded mb-2">
+                    <option value="day">Día</option>
+                    <option value="week">Semana</option>
+                    <option value="month">Mes</option>
+                </select>
+                <div id="stats" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- Lista de Gastos -->
+            <div>
+                <h2 class="text-xl font-semibold mb-2">Gastos Recientes</h2>
+                <ul id="expenseList" class="space-y-2"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
