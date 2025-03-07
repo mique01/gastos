@@ -1,99 +1,17 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+body {
   font-family: Arial, sans-serif;
-}
-
-.auth-container, .dashboard-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
   text-align: center;
-}
-
-.auth-container h2 {
-  margin-bottom: 20px;
-}
-
-.auth-container input, .expense-form input, .expense-form select, .custom-inputs input {
-  display: block;
-  width: 100%;
-  max-width: 300px;
-  margin: 10px auto;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  background-color: #f5f5f5;
 }
 
 button {
-  background-color: #0088FE;
+  background-color: #6200ea;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
+  padding: 10px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #0066CC;
-}
-
-.google-btn {
-  background-color: #FF8042;
-  margin-top: 10px;
-}
-
-.google-btn:hover {
-  background-color: #FF6300;
-}
-
-.toggle-auth {
-  margin-top: 15px;
-  color: #0088FE;
-  cursor: pointer;
-}
-
-.signout-btn {
-  float: right;
-  background-color: #FFBB28;
-}
-
-.signout-btn:hover {
-  background-color: #FF9900;
-}
-
-.expense-form {
-  margin: 20px 0;
-}
-
-.expense-form select[multiple] {
-  height: 100px;
-}
-
-.custom-inputs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.charts-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-}
-
-.loading {
-  text-align: center;
-  margin-top: 50px;
-}
-
-@media (max-width: 600px) {
-  .charts-container {
-    flex-direction: column;
-    align-items: center;
-  }
+  background-color: #3700b3;
 }
